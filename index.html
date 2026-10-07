@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTOCOLO VIPER v3.0 - SUPREME EDITION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/interface.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- LOW HP VIGNETTE -->
+        <div id="lowHpVignette"></div>
+
+        <!-- FPS COUNTER -->
+        <div id="fpsCounter">FPS: --</div>
+
+        <!-- WAVE ANNOUNCEMENT -->
+        <div id="waveAnnounce">
+            <div class="wave-announce-text" id="waveAnnounceText">WAVE 1</div>
+            <div class="wave-announce-sub" id="waveAnnounceSub">PREPARE-SE</div>
+        </div>
+
+        <!-- HUD -->
+        <div id="hud">
+            <div class="hud-panel">
+                <div class="health-container">
+                    <div class="hud-label">Hull Integrity</div>
+                    <div class="health-bar-outer">
+                        <div class="health-bar-inner" id="healthFill"></div>
+                    </div>
+                    <div class="hud-value" id="healthValue">100</div>
+                    <div class="shield-bar-outer">
+                        <div class="shield-bar-inner interface-style-1" id="shieldFill"></div>
+                    </div>
+                </div>
+                <div class="dash-container" id="dashContainer"></div>
+                <div class="weapon-container">
+                    <div class="hud-label">Weapons</div>
+                    <div class="weapon-slots" id="weaponSlots"></div>
+                </div>
+                <div class="ability-container interface-style-2" id="abilityContainer">
+                    <div class="ability-bar">
+                        <div class="ability-fill" id="abilityFill"></div>
+                    </div>
+                    <div class="ability-label" id="abilityLabel">Ultimate</div>
+                </div>
+            </div>
+            
+            <div class="interface-style-3">
+                <div class="wave-indicator">WAVE <span id="waveNum">1</span> / <span id="maxWaveNum">100</span></div>
+                <div class="wave-progress">
+                    <div class="wave-progress-fill" id="waveProgress"></div>
+                </div>
+                <div class="combo-display" id="comboDisplay">x1</div>
+            </div>
+            
+            <div class="hud-panel interface-style-4">
+                <div class="hud-label">Score</div>
+                <div class="hud-value score" id="scoreValue">0</div>
+                <div class="hud-label interface-style-5">Eliminacoes</div>
+                <div class="hud-value kills" id="killsValue">0</div>
+            </div>
+        </div>
+
+        <!-- MINIMAP -->
+        <div id="minimapContainer">
+            <canvas id="minimapCanvas" width="180" height="180"></canvas>
+        </div>
+
+        <!-- KILL FEED -->
+        <div id="killFeed"></div>
+        
+        <!-- Boss HP -->
+        <div id="bossHpContainer">
+            <div class="boss-name" id="bossName">BOSS</div>
+            <div class="boss-hp-outer">
+                <div class="boss-hp-inner" id="bossHpFill"></div>
+            </div>
+            <div class="boss-phase-indicator" id="bossPhases"></div>
+        </div>
+        
+        <!-- Radio -->
+        <div id="radioMessage">
+            <div class="radio-header">
+                <div class="radio-avatar">AI</div>
+                <div class="radio-sender">C.A.S.S.I.</div>
+            </div>
+            <div class="radio-text" id="radioText"></div>
+        </div>
+        
+        <!-- Boss Warning -->
+        <div id="bossWarning">
+            <div class="boss-warning-title">WARNING</div>
+            <div class="boss-warning-sub">INCOMING HOSTILE ENTITY</div>
+        </div>
+        
+        <!-- MUSIC PLAYER -->
+        <div id="musicPlayer">
+            <div class="music-header">
+                <div class="music-title" id="currentSongTitle">Nenhuma musica selecionada</div>
+                <div class="music-controls">
+                    <button id="prevSongBtn" title="Musica Anterior">&#9664;</button>
+                    <button id="playPauseBtn" class="play-pause-btn" title="Play/Pause">&#9654;</button>
+                    <button id="nextSongBtn" title="Proxima Musica">&#9654;</button>
+                    <button id="playlistBtn" title="Abrir Playlist">&#9776;</button>
+                </div>
+            </div>
+            <div class="volume-control">
+                <span class="interface-style-6">&#128266;</span>
+                <input type="range" id="volumeSlider" min="0" max="100" value="70" step="1">
+            </div>
+        </div>
+
+        <!-- PLAYLIST MENU -->
+        <div id="playlistMenu">
+            <div class="menu-bg-effect"><div class="menu-bg-grid"></div></div>
+            <div class="playlist-title">Playlist</div>
+            <div class="playlist-list" id="playlistSongs">
+                <p class="no-songs">Nenhuma musica carregada.</p>
+            </div>
+            <label for="fileInput" class="menu-btn interface-style-7">Adicionar Musicas (.mp3)</label>
+            <input type="file" id="fileInput" accept=".mp3" multiple>
+            <button class="menu-btn secondary interface-style-8" onclick="hidePlaylistMenu()">Fechar</button>
+        </div>
+
+        <!-- MAIN MENU -->
+        <div class="menu-overlay" id="mainMenu">
+            <div class="menu-bg-effect"><div class="menu-bg-grid"></div></div>
+            <div class="game-title">VIPER</div>
+            <div class="game-subtitle">Protocolo v3.0 - Supreme Edition</div>
+            <div class="difficulty-container" id="difficultySelect">
+                <div class="difficulty-card easy" data-diff="easy">
+                    <div class="difficulty-icon">&#9734;</div>
+                    <div class="difficulty-name">EASY</div>
+                    <div class="difficulty-desc">Para iniciantes</div>
+                    <div class="difficulty-stats">
+                        <div class="diff-stat">Dano: <span>-40%</span></div>
+                        <div class="diff-stat">Vida: <span>+50%</span></div>
+                    </div>
+                </div>
+                <div class="difficulty-card normal selected" data-diff="normal">
+                    <div class="difficulty-icon">&#9733;</div>
+                    <div class="difficulty-name">NORMAL</div>
+                    <div class="difficulty-desc">Experiencia padrao</div>
+                    <div class="difficulty-stats">
+                        <div class="diff-stat">Dano: <span>Base</span></div>
+                        <div class="diff-stat">Vida: <span>Base</span></div>
+                    </div>
+                </div>
+                <div class="difficulty-card hard" data-diff="hard">
+                    <div class="difficulty-icon">&#9760;</div>
+                    <div class="difficulty-name">HARD</div>
+                    <div class="difficulty-desc">Para veteranos</div>
+                    <div class="difficulty-stats">
+                        <div class="diff-stat">Dano: <span>+50%</span></div>
+                        <div class="diff-stat">Vida: <span>-20%</span></div>
+                    </div>
+                </div>
+                <div class="difficulty-card impossible" data-diff="impossible">
+                    <div class="difficulty-icon">&#9763;</div>
+                    <div class="difficulty-name">IMPOSSIBLE</div>
+                    <div class="difficulty-desc">Morte certa</div>
+                    <div class="difficulty-stats">
+                        <div class="diff-stat">Dano: <span>+100%</span></div>
+                        <div class="diff-stat">Vida: <span>-40%</span></div>
+                    </div>
+                </div>
+                 <div class="difficulty-card hell" data-diff="hell">
+                    <div class="difficulty-icon">&#10040;</div>
+                    <div class="difficulty-name">HELL</div>
+                    <div class="difficulty-desc">Para os verdadeiramente loucos</div>
+                    <div class="difficulty-stats">
+                        <div class="diff-stat">Dano: <span>+150%</span></div>
+                        <div class="diff-stat">Vida: <span>-60%</span></div>
+                        <div class="diff-stat">Inimigos: <span>+30%</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="showShipSelect()">INICIAR PROTOCOLO</button>
+                <button class="menu-btn secondary" onclick="showControls()">CONTROLES</button>
+            </div>
+        </div>
+        
+        <!-- SHIP SELECTION -->
+        <div class="menu-overlay hidden" id="shipSelectMenu">
+            <div class="menu-bg-effect"><div class="menu-bg-grid"></div></div>
+            <div class="ship-select-title">SELECIONE SUA NAVE</div>
+            <div class="ship-select-subtitle">Cada nave possui habilidades e armas unicas</div>
+            <div class="ship-grid" id="shipGrid"></div>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="startGame()">INICIAR MISSAO</button>
+                <button class="menu-btn secondary" onclick="backToMenu()">VOLTAR</button>
+            </div>
+        </div>
+        
+        <!-- CONTROLS -->
+        <div class="menu-overlay hidden" id="controlsMenu">
+            <div class="game-title interface-style-9">CONTROLES</div>
+            <div class="controls-container">
+                <div class="controls-section">
+                    <div class="controls-section-title">Movimento</div>
+                    <div class="control-row"><span class="control-action">Mover</span><div class="control-keys"><span class="control-key">W</span><span class="control-key">A</span><span class="control-key">S</span><span class="control-key">D</span></div></div>
+                    <div class="control-row"><span class="control-action">Mira</span><div class="control-keys"><span class="control-key">MOUSE</span></div></div>
+                </div>
+                <div class="controls-section">
+                    <div class="controls-section-title">Combate</div>
+                    <div class="control-row"><span class="control-action">Disparar</span><div class="control-keys"><span class="control-key">CLIQUE ESQ</span></div></div>
+                    <div class="control-row"><span class="control-action">Dash</span><div class="control-keys"><span class="control-key">ESPACO</span></div></div>
+                    <div class="control-row"><span class="control-action">Trocar Arma</span><div class="control-keys"><span class="control-key">1</span><span class="control-key">2</span><span class="control-key">3</span></div></div>
+                    <div class="control-row"><span class="control-action">Habilidade Especial</span><div class="control-keys"><span class="control-key">Q</span></div></div>
+                </div>
+                <div class="controls-section">
+                    <div class="controls-section-title">Sistema</div>
+                    <div class="control-row"><span class="control-action">Pausar</span><div class="control-keys"><span class="control-key">ESC</span></div></div>
+                    <div class="control-row"><span class="control-action">Musica</span><div class="control-keys"><span class="control-key">M</span></div></div>
+                    <div class="control-row"><span class="control-action">Minimapa</span><div class="control-keys"><span class="control-key">TAB</span></div></div>
+                </div>
+            </div>
+            <button class="menu-btn secondary" onclick="backToMenu()">VOLTAR</button>
+        </div>
+        
+        <!-- PAUSE -->
+        <div id="pauseMenu">
+            <div class="pause-title">PAUSADO</div>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="resumeGame()">CONTINUAR</button>
+                <button class="menu-btn secondary" onclick="restartGame()">REINICIAR</button>
+                <button class="menu-btn danger" onclick="quitToMenu()">MENU PRINCIPAL</button>
+            </div>
+        </div>
+        
+        <!-- UPGRADE -->
+        <div id="upgradePanel">
+            <div class="upgrade-header">
+                <div class="upgrade-title">ESCOLHA SEU UPGRADE</div>
+                <div class="upgrade-subtitle">Selecione uma melhoria para sua nave</div>
+            </div>
+            <div class="upgrade-grid" id="upgradeGrid"></div>
+        </div>
+        
+        <!-- GAME OVER -->
+        <div id="gameOverScreen">
+            <div class="end-title defeat">PROTOCOLO FALHOU</div>
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div class="stat-item"><div class="stat-value" id="finalWave">1</div><div class="stat-label">Onda Alcancada</div></div>
+                    <div class="stat-item"><div class="stat-value" id="finalScore">0</div><div class="stat-label">Pontuacao</div></div>
+                    <div class="stat-item"><div class="stat-value" id="finalKills">0</div><div class="stat-label">Eliminacoes</div></div>
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="restartGame()">TENTAR NOVAMENTE</button>
+                <button class="menu-btn secondary" onclick="quitToMenu()">MENU PRINCIPAL</button>
+            </div>
+        </div>
+        
+        <!-- VICTORY -->
+        <div id="victoryScreen">
+            <div class="end-title victory">PROTOCOLO COMPLETO</div>
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div class="stat-item"><div class="stat-value" id="victoryScore">0</div><div class="stat-label">Pontuacao Final</div></div>
+                    <div class="stat-item"><div class="stat-value" id="victoryKills">0</div><div class="stat-label">Total Eliminacoes</div></div>
+                    <div class="stat-item"><div class="stat-value" id="victoryTime">00:00</div><div class="stat-label">Tempo Total</div></div>
+                </div>
+            </div>
+            <button class="menu-btn" onclick="quitToMenu()">MENU PRINCIPAL</button>
+        </div>
+    </div>
+
+<script src="js/01-config.js"></script>
+<script src="js/02-state.js"></script>
+<script src="js/03-visuals.js"></script>
+<script src="js/04-player.js"></script>
+<script src="js/05-enemies.js"></script>
+<script src="js/06-combat.js"></script>
+<script src="js/07-waves-ui.js"></script>
+<script src="js/08-audio.js"></script>
+<script src="js/09-game.js"></script>
+</body>
+</html>
